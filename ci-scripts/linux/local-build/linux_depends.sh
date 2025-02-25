@@ -449,7 +449,7 @@ function _libRhubarb() {
 		then
 		   rm -rf ffmpeg
 		fi
-	wget https://github.com/charliemartinez/FFmpeg/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
+	wget https://github.com/charliemartinez/libmypaint/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
 	unzip ffmpeg-5.0.0-linux64-static-lgpl.zip 
 	mv ffmpeg-5.0.0-linux64-static-lgpl ffmpeg
 
@@ -543,117 +543,132 @@ function _arguments() {
 	selected_libraries=()
 	install_dependencies_only=true
 	reset_requested=false
+	invalid_argument=false
 
-	# First, check if the --reset parameter is present and execute it.
-		for arg in "$@"; do
-			if [[ "$arg" == "-c" || "$arg" == "--clear" ]]; then
-				_clear
-			fi
-		done
-
-		if [ $# -ne 0 ]; then
-			# If there are parameters, run _depends before processing them.
-			_depends
-			install_dependencies_only=false
-
-			# Process the parameters.
-			for arg in "$@"; do
-				case $arg in
-					-o|--opencv)
-						if [ -e "$CHECKFILE_OPENCV" ]; then
-							echo -e "\nOpenCV $(_msg ALREADY_COMPILED)"
-						else
-							selected_libraries+=("OpenCV")
-						fi
-						;;
-					-f|--ffmpeg)
-						if [ -e "$HECKFILE_LIBFFMPEG" ]; then
-							echo -e "\nFFmpeg $(_msg ALREADY_COMPILED)"
-						else
-							selected_libraries+=("FFmpeg")
-						fi
-						;;
-					-g|--gphoto)
-						if [ -e "$CHECKFILE_GPHOTO" ]; then
-							echo -e "\nGPhoto $(_msg ALREADY_COMPILED)"
-						else
-							selected_libraries+=("GPhoto")
-						fi
-						;;
-					-m|--mypaint)
-						if [ -e "$CHECKFILE_MYPAINT" ]; then
-							echo -e "\nMyPaint $(_msg ALREADY_COMPILED)"
-						else
-							selected_libraries+=("MyPaint")
-						fi
-						;;
-					-r|--rhubarb)
-						if [ -e "$CHECKFILE_RHUBARB" ]; then
-							echo -e "\nRhubarb $(_msg ALREADY_COMPILED)"
-						else
-							selected_libraries+=("Rhubarb")
-						fi
-						;;
-					-c|--clear)
-						# It was already processed in the first pass.
-						;;
-					*)
-						echo -e "\n$(_msg USAGE)\n"
-						exit 1
-						;;
-				esac
-			done
+	# First, check if the --clear parameter is present and execute it.
+	for arg in "$@"; do
+		if [[ "$arg" == "-c" || "$arg" == "--clear" ]]; then
+			_clear
 		fi
+	done
 
-		# Confirm compilation if there are selected libraries.
-		if ! $install_dependencies_only; then
-			echo -e "\n$(_msg LIBRARIES_TO_COMPILE)"
-			for param in "${selected_libraries[@]}"; do
-				echo "- $param"
-			done
+	# Validate arguments first
+	for arg in "$@"; do
+		case $arg in
+			-o|--opencv|-f|--ffmpeg|-g|--gphoto|-m|--mypaint|-r|--rhubarb|-c|--clear)
+				;;
+			*)
+				invalid_argument=true
+				;;
+		esac
+	done
 
-			echo -e "\n$(_msg CONTINUE_COMPILATION)"
-			echo "1) $(_msg ACEPT)"
-			echo "2) $(_msg CANCEL)"
-			read -p "$(_msg OPTION): " choice
-			
-			if [[ "$choice" -ne 1 ]]; then
-				echo -e "\n$(_msg EXIT_INSTALL)\n"
-				exit 1
-			fi
-		fi
+	# If an invalid argument is found, show usage and exit before running _depends
+	if $invalid_argument; then
+		echo -e "\n$(_msg USAGE)\n"
+		exit 1
+	fi
 
-		# Clone the repository if necessary.
-		if ! $install_dependencies_only; then
-			_cloneIf
-		fi
+	# Run _depends only if there are valid parameters
+	if [ $# -ne 0 ]; then
+		_depends
+		install_dependencies_only=false
+	fi
 
-		# Compile the selected libraries.
+	# Process the parameters
+	for arg in "$@"; do
+		case $arg in
+			-o|--opencv)
+				if [ -e "$CHECKFILE_OPENCV" ]; then
+					echo -e "\nOpenCV $(_msg ALREADY_COMPILED)"
+				else
+					selected_libraries+=("OpenCV")
+				fi
+				;;
+			-f|--ffmpeg)
+				if [ -e "$CHECKFILE_LIBFFMPEG" ]; then
+					echo -e "\nFFmpeg $(_msg ALREADY_COMPILED)"
+				else
+					selected_libraries+=("FFmpeg")
+				fi
+				;;
+			-g|--gphoto)
+				if [ -e "$CHECKFILE_GPHOTO" ]; then
+					echo -e "\nGPhoto $(_msg ALREADY_COMPILED)"
+				else
+					selected_libraries+=("GPhoto")
+				fi
+				;;
+			-m|--mypaint)
+				if [ -e "$CHECKFILE_MYPAINT" ]; then
+					echo -e "\nMyPaint $(_msg ALREADY_COMPILED)"
+				else
+					selected_libraries+=("MyPaint")
+				fi
+				;;
+			-r|--rhubarb)
+				if [ -e "$CHECKFILE_RHUBARB" ]; then
+					echo -e "\nRhubarb $(_msg ALREADY_COMPILED)"
+				else
+					selected_libraries+=("Rhubarb")
+				fi
+				;;
+			-c|--clear)
+				# Already processed in the first pass
+				;;
+		esac
+	done
+
+	# Confirm compilation if there are selected libraries.
+	if ! $install_dependencies_only; then
+		echo -e "\n$(_msg LIBRARIES_TO_COMPILE)"
 		for param in "${selected_libraries[@]}"; do
-			case $param in
-				"OpenCV")
-					echo -e "\n$(_msg PARAMETER_O_libOpencv_SELECTED)\n"
-					_libOpencv
-					;;
-				"FFmpeg")
-					echo -e "\n$(_msg PARAMETER_F_libFFmpeg_SELECTED)\n"
-					_libFFmpeg
-					;;
-				"GPhoto")
-					echo -e "\n$(_msg PARAMETER_libGphoto2_SELECTED)\n"
-					_libGphoto2
-					;;
-				"MyPaint")
-					echo -e "\n$(_msg PARAMETER_MPAINT_SELECTED)\n"
-					_libMyPaint
-					;;
-				"Rhubarb")
-					echo -e "\n$(_msg PARAMETER_RHUBARB_SELECTED)\n"
-					_libMyPaint
-					;;
-			esac
+			echo "- $param"
 		done
+
+		echo -e "\n$(_msg CONTINUE_COMPILATION)"
+		echo "1) $(_msg ACEPT)"
+		echo "2) $(_msg CANCEL)"
+		read -p "$(_msg OPTION): " choice
+		
+		if [[ "$choice" -ne 1 ]]; then
+			echo -e "\n$(_msg EXIT_INSTALL)\n"
+			exit 1
+		fi
+	fi
+
+	# Clone the repository if necessary.
+	if ! $install_dependencies_only; then
+		_cloneIf
+	fi
+
+	# Compile the selected libraries.
+	for param in "${selected_libraries[@]}"; do
+		case $param in
+			"OpenCV")
+				echo -e "\n$(_msg PARAMETER_O_libOpencv_SELECTED)\n"
+				_libOpencv
+				;;
+			"FFmpeg")
+				echo -e "\n$(_msg PARAMETER_F_libFFmpeg_SELECTED)\n"
+				_libFFmpeg
+				;;
+			"GPhoto")
+				echo -e "\n$(_msg PARAMETER_libGphoto2_SELECTED)\n"
+				_libGphoto2
+				;;
+			"MyPaint")
+				echo -e "\n$(_msg PARAMETER_MPAINT_SELECTED)\n"
+				_libMyPaint
+				;;
+			"Rhubarb")
+				echo -e "\n$(_msg PARAMETER_RHUBARB_SELECTED)\n"
+				_libRhubarb
+				;;
+		esac
+	done
 }
+
 
 function _end() {
 	echo -e "\n\n$(_msg OK_DEPENDS)\n\n"
