@@ -447,7 +447,7 @@ function _libMyPaint() {
 
 	ldconfig
 
-	touch $CHECKFILE_MYPAINT
+	touch $CHECKFILE_MPAINT
 }
 
 function _libRhubarb() {
