@@ -299,77 +299,95 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 function _libFFmpeg(){
 	# With -f | --ffmpeg parameter 
 	_cloneIf
-
 	cd "$THIRDPARTY_DIR"
 
-	echo ">>> $(_msg CLONING_OPENH264)"
-	git clone https://github.com/charliemartinez/openh264 openh264 || true # author script repository
+		if [ ! -d apps ]
+		then
+		   mkdir apps
+		fi
+		cd apps
+		echo "*" >| .gitignore
 
-	cd openh264
-	echo "*" >| .gitignore
+	echo ">>> Getting FFmpeg"
+		if [ -d ffmpeg ]
+		then
+		   rm -rf ffmpeg
+		fi
+	wget https://github.com/charliemartinez/libmypaint/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
+	unzip ffmpeg-5.0.0-linux64-static-lgpl.zip 
+	mv ffmpeg-5.0.0-linux64-static-lgpl ffmpeg
 
-	echo ">>> $(_msg MAKING_OPENH264)"
-	make || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
+#	cd "$THIRDPARTY_DIR"
 
-	echo ">>> $(_msg INSTALLING_OPENH264)"
-	make install || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
+#	echo ">>> $(_msg CLONING_OPENH264)"
+#	git clone https://github.com/charliemartinez/openh264 openh264 || true # author script repository
 
-	cd ..
+#	cd openh264
+#	echo "*" >| .gitignore
 
-	echo ">>> $(_msg CLONING_libFFmpeg)"
-	git clone -b v4.3.1 https://github.com/charliemartinez/FFmpeg ffmpeg # author script repository
+#	echo ">>> $(_msg MAKING_OPENH264)"
+#	make || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
 
-	cd ffmpeg
-	echo "*" >| .gitignore
+#	echo ">>> $(_msg INSTALLING_OPENH264)"
+#	make install || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
 
-	echo ">>> $(_msg CONFIGURING_TO_BUILD_FFMPEG_SHARED)"
+#	cd ..
+
+#	echo ">>> $(_msg CLONING_libFFmpeg)"
+#	git clone https://github.com/charliemartinez/FFmpeg ffmpeg # author script repository
+
+#	cd ffmpeg
+#	echo "*" >| .gitignore
+
+#	echo ">>> $(_msg CONFIGURING_TO_BUILD_FFMPEG_SHARED)"
 	
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+# export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+ 
+#./configure  --prefix=/usr/local \
+#	  --cc="$CC" \
+#	  --cxx="$CXX" \
+#	  --toolchain=hardened \
+#	  --pkg-config-flags="--static" \
+#	  --extra-cflags="-I/usr/local/include" \
+#	  --extra-ldflags="-L/usr/local/lib" \
+#	  --enable-pthreads \
+#	  --enable-version3 \
+#	  --enable-avresample \
+#	  --enable-gnutls \
+#	  --enable-libbluray \
+#	  --enable-libmp3lame \
+#	  --enable-libopus \
+#	  --enable-libsnappy \
+#	  --enable-libtheora \
+#	  --enable-libvorbis \
+#	  --enable-libvpx \
+#	  --enable-libwebp \
+#	  --enable-libxml2 \
+#	  --enable-lzma \
+#	  --enable-libfreetype \
+#	  --enable-libass \
+#	  --enable-libopencore-amrnb \
+#	  --enable-libopencore-amrwb \
+#	  --enable-libopenjpeg \
+#	  --enable-libspeex \
+#	  --enable-libsoxr \
+#	  --enable-libopenh264 \
+#	  --enable-shared \
+#	  --disable-static \
+#	  --disable-libjack \
+#	  --disable-indev=jack
 
-./configure  --prefix=/usr/local \
-	  --cc="$CC" \
-	  --cxx="$CXX" \
-	  --toolchain=hardened \
-	  --pkg-config-flags="--static" \
-	  --extra-cflags="-I/usr/local/include" \
-	  --extra-ldflags="-L/usr/local/lib" \
-	  --enable-pthreads \
-	  --enable-version3 \
-	  --enable-avresample \
-	  --enable-gnutls \
-	  --enable-libbluray \
-	  --enable-libmp3lame \
-	  --enable-libopus \
-	  --enable-libsnappy \
-	  --enable-libtheora \
-	  --enable-libvorbis \
-	  --enable-libvpx \
-	  --enable-libwebp \
-	  --enable-libxml2 \
-	  --enable-lzma \
-	  --enable-libfreetype \
-	  --enable-libass \
-	  --enable-libopencore-amrnb \
-	  --enable-libopencore-amrwb \
-	  --enable-libopenjpeg \
-	  --enable-libspeex \
-	  --enable-libsoxr \
-	  --enable-libopenh264 \
-	  --enable-shared \
-	  --disable-static \
-	  --disable-libjack \
-	  --disable-indev=jack
+#	echo ">>> $(_msg BUILDING_libFFmpeg_SHARED)"
+#	make -j$(nproc) || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
 
-	echo ">>> $(_msg BUILDING_libFFmpeg_SHARED)"
-	make -j$(nproc) || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
+#	echo ">>> $(_msg INSTALLING_libFFmpeg_SHARED)"
+#	make install || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
 
-	echo ">>> $(_msg INSTALLING_libFFmpeg_SHARED)"
-	make install || { echo "$(_msg FFMPEG_BUILD_ERROR)"; exit 1; }
+#	ldconfig
 
-	ldconfig
-
-	cd "$SCRIPT_DIR"
+#	cd "$SCRIPT_DIR"
 	touch "$CHECKFILE_FFMPEG"
+
 }
 
 function _libGphoto2() {
@@ -434,25 +452,25 @@ function _libMyPaint() {
 function _libRhubarb() {
 	# With -r | --rhubarb parameter 
 	_cloneIf
+	_libFFmpeg
 
-	cd "$THIRDPARTY_DIR"
+#	cd "$THIRDPARTY_DIR"
 
-		if [ ! -d apps ]
-		then
-		   mkdir apps
-		fi
-		cd apps
-		echo "*" >| .gitignore
+#		if [ ! -d apps ]
+#		then
+#		   mkdir apps
+#		fi
+#		cd apps
+#		echo "*" >| .gitignore
 
-	echo ">>> Getting FFmpeg"
-		if [ -d ffmpeg ]
-		then
-		   rm -rf ffmpeg
-		fi
-	wget https://github.com/charliemartinez/libmypaint/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
-	unzip ffmpeg-5.0.0-linux64-static-lgpl.zip 
-	mv ffmpeg-5.0.0-linux64-static-lgpl ffmpeg
-
+#	echo ">>> Getting FFmpeg"
+#		if [ -d ffmpeg ]
+#		then
+#		   rm -rf ffmpeg
+#		fi
+#	wget https://github.com/charliemartinez/libmypaint/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
+#	unzip ffmpeg-5.0.0-linux64-static-lgpl.zip 
+#	mv ffmpeg-5.0.0-linux64-static-lgpl ffmpeg
 
 	echo ">>> Getting Rhubarb Lip Sync"
 		if [ -d rhubarb ]
