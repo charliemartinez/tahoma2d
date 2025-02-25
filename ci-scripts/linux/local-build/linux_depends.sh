@@ -57,55 +57,52 @@ function _checkFolder() {
 		fi
 }
 
-function _ownership() {
-    # If TAHOMA_DIR does not exist, exit the function
-    if [ ! -d "$TAHOMA_DIR" ]; then
-        return
-    fi
+	function _ownership() {
+		# If TAHOMA_DIR does not exist, exit the function
+		if [ ! -d "$TAHOMA_DIR" ]; then
+			return
+		fi
 
-    # Check if any file or folder inside TAHOMA_DIR is owned by root
-    if find "$TAHOMA_DIR" -user root | grep -q .; then
-        while true; do
-            echo -e "\n$(_msg TAHOMA2D_OWNED_BY_ROOT)"
-            echo -e "$(_msg LINUX_BUILD_SH_NO_ROOT)"
-            echo -e "$(_msg WOULD_YOU_LIKE_TO_ENTER_NORMAL_USERNAME)"
-            echo -e "1) $(_msg ENTER_NORMAL_USER)\n2) $(_msg IGNORE_WARNING)"
+		# Check if any file or folder inside TAHOMA_DIR is owned by root
+		if [ -n "$(find "$TAHOMA_DIR" -user root 2>/dev/null)" ]; then
+			while true; do
+				echo -e "\n$(_msg TAHOMA2D_OWNED_BY_ROOT)"
+				echo -e "$(_msg LINUX_BUILD_SH_NO_ROOT)"
+				echo -e "$(_msg WOULD_YOU_LIKE_TO_ENTER_NORMAL_USERNAME)"
+				echo -e "1) $(_msg ENTER_NORMAL_USER)\n2) $(_msg IGNORE_WARNING)"
 
-            read -r OPTION
+				read -r OPTION
 
-            # Validate that the input is a valid number
-            if ! [[ "$OPTION" =~ ^[1-2]$ ]]; then
-                echo -e "\n$(_msg INVALID_OPTION_TRY_AGAIN)"
-                continue
-            fi
+				if ! [[ "$OPTION" =~ ^[1-2]$ ]]; then
+					echo -e "\n$(_msg INVALID_OPTION_TRY_AGAIN)"
+					continue
+				fi
 
-            case "$OPTION" in
-                1)
-                    while true; do
-                        echo -e "$(_msg ENTER_NORMAL_USER_NAME)"
-                        read -r USERNAME
+				case "$OPTION" in
+					1)
+						while true; do
+							echo -e "$(_msg ENTER_NORMAL_USER_NAME)"
+							read -r USERNAME
 
-                        # Verify that the user entered something
-                        if [ -z "$USERNAME" ]; then
-                            echo -e "\n$(_msg USERNAME_CANNOT_BE_EMPTY)"
-                            continue
-                        fi
+							if [ -z "$USERNAME" ]; then
+								echo -e "\n$(_msg USERNAME_CANNOT_BE_EMPTY)"
+								continue
+							fi
 
-                        # Change the ownership recursively
-                        chown -R "$USERNAME":"$USERNAME" "$TAHOMA_DIR"
-                        echo -e "\n$(_msg PROPERTY_CHANGED)"
-                        break
-                    done
-                    break
-                    ;;
-                2)
-                    echo -e "\n$(_msg IGNORED_WARNING)"
-                    break
-                    ;;
-            esac
-        done
-    fi
-}
+							chown -R "$USERNAME":"$USERNAME" "$TAHOMA_DIR"
+							echo -e "\n$(_msg PROPERTY_CHANGED)"
+							break
+						done
+						break
+						;;
+					2)
+						echo -e "\n$(_msg IGNORED_WARNING)"
+						break
+						;;
+				esac
+			done
+		fi
+	}
 
 function _checkRoot() {	
 	# This program need administrator privileges.
