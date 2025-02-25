@@ -24,8 +24,7 @@
 # Variables
 # ======================================================================
 
-	REPO_URL="https://github.com/tahoma2d/tahoma2d.git"
-	#REPO_URL="https://github.com/charliemartinez/tahoma2d.git" #author script fork
+	REPO_URL="https://github.com/charliemartinez/tahoma2d.git" #author script fork
 	OPTS=""
 	SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
