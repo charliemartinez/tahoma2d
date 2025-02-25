@@ -253,20 +253,23 @@ function _bye() {
 }
 
 function _menu() {
-	# End options
 		if [ -e "$BIN_DIR" ]; then
-			opPrincipal=$(dialog --title "$(_msg NAVIGATE) ← →  | $(_msg CONFIRM) <Enter>" \
-			--backtitle "$(_copyright)" \
-			--menu 16 65 8 \
-			1 "$(_msg EXECUTE)" \
-			2 "$(_msg INSTALL)" \
-			3 "$(_msg EXIT)" \
+		echo "EJECUTANDO MENU"
+		opPrincipal=$(dialog --title "$(_msg NAVIGATE) ↑ ↓ ← → | $(_msg CONFIRM) <Enter>" \
+		--backtitle "$(_copyright)" \
+		--menu "Selecciona una opción:" 10 60 3 \
+			1 "Ejecutar" \
+			2 "Instalar" \
+			3 "Salir" \
 			3>&1 1>&2 2>&3)
-			case "$opPrincipal" in
-				1) _run ;;
-				2) _install ;;
-				3) _bye ;;
-			esac
+
+		echo "Verificación: Se seleccionó la opción '$opPrincipal'"
+
+		case "$opPrincipal" in
+			1)  _run ;;
+			2) _install ;;
+			3) _bye ;;
+		esac
 		fi
 }
 
@@ -275,24 +278,30 @@ function _warning() {
 		dialog --title "$(_msg CONFIRM) <Enter>" \
 			   --backtitle "$(_copyright)" \
 			   --yesno "$(_msg WARNING)" 10 60    
-		if [ $? -ne 0 ]; then
-			_bye 
-		else
-			_libTiff
-			_build  
-		fi
+#		if [ $? -ne 0 ]; then
+#			_bye 
+#		fi
 }
 
 # ======================================================================
 # Functions execution
 # ======================================================================
 
+SHOW_MENU=true  # Cambia a true si necesitas el menú
+
 function _main() {
-	_checkRoot	# This script should NOT be run as root.
-	_checkInternet	# We need the internet
-	_checkDepends	# The dependencies must be installed first.
-	_cloningTahoma	# Cloning from the path set in the ./assets/var file.
-	_warning	# Display a warning message before compilation.  
+	_checkRoot
+	_checkInternet
+	_checkDepends
+	_cloningTahoma
+	_warning
+	_stuff
+	_systemVar
+	_libTiff
+	_build
+	_menu
 }
 
 _main
+
+./Tahoma2D: error while loading shared libraries: libcolorfx.so: cannot open shared object chcccccharlichchcccharlcharcharlie@escharliechacccccharliecharcharliecharchcccharlie@echarlcharccccharlcchacharlie@estcharlichacharlie@estudio:~/Escritorio/tahoma2d-scripts-linux/tahoma2d/ci-scripts/linux/local-build$ 
