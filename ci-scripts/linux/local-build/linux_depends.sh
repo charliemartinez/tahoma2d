@@ -58,59 +58,53 @@ function _checkFolder() {
 }
 
 function _ownership() {
-		# If TAHOMA_DIR does not exist, exit the function
-		if [ ! -d "$TAHOMA_DIR" ]; then
-			return
-		fi
+    # If TAHOMA_DIR does not exist, exit the function
+    if [ ! -d "$TAHOMA_DIR" ]; then
+        return
+    fi
 
-	# Get the current owner of the folder
-	OWNER=$(stat -c "%U" "$TAHOMA_DIR")
+    # Check if any file or folder inside TAHOMA_DIR is owned by root
+    if find "$TAHOMA_DIR" -user root | grep -q .; then
+        while true; do
+            echo -e "\n$(_msg TAHOMA2D_OWNED_BY_ROOT)"
+            echo -e "$(_msg LINUX_BUILD_SH_NO_ROOT)"
+            echo -e "$(_msg WOULD_YOU_LIKE_TO_ENTER_NORMAL_USERNAME)"
+            echo -e "1) $(_msg ENTER_NORMAL_USER)\n2) $(_msg IGNORE_WARNING)"
 
-	# If the owner is not root, exit the function
-		if [ "$OWNER" != "root" ]; then
-			return
-		fi
+            read -r OPTION
 
-	# If the owner is root, show a warning and request user action
-		while true; do
-			echo -e "\n$(_msg TAHOMA2D_OWNED_BY_ROOT)"
-			echo -e "$(_msg LINUX_BUILD_SH_NO_ROOT)"
-			echo -e "$(_msg WOULD_YOU_LIKE_TO_ENTER_NORMAL_USERNAME)"
-			echo -e "1) $(_msg ENTER_NORMAL_USER)\n2) $(_msg IGNORE_WARNING)"
+            # Validate that the input is a valid number
+            if ! [[ "$OPTION" =~ ^[1-2]$ ]]; then
+                echo -e "\n$(_msg INVALID_OPTION_TRY_AGAIN)"
+                continue
+            fi
 
-			read -r OPTION
+            case "$OPTION" in
+                1)
+                    while true; do
+                        echo -e "$(_msg ENTER_NORMAL_USER_NAME)"
+                        read -r USERNAME
 
-			# Validate that the input is a valid number
-			if ! [[ "$OPTION" =~ ^[1-2]$ ]]; then
-				echo -e "\n$(_msg INVALID_OPTION_TRY_AGAIN)"
-				continue
-			fi
+                        # Verify that the user entered something
+                        if [ -z "$USERNAME" ]; then
+                            echo -e "\n$(_msg USERNAME_CANNOT_BE_EMPTY)"
+                            continue
+                        fi
 
-			case "$OPTION" in
-				1)
-					while true; do
-						echo -e "$(_msg ENTER_NORMAL_USER_NAME)"
-						read -r USERNAME
-
-						# Verify that the user entered something
-						if [ -z "$USERNAME" ]; then
-							echo -e "\n$(_msg USERNAME_CANNOT_BE_EMPTY)"
-							continue
-						fi
-
-						# Change the folder ownership to the entered user
-						chown -R "$USERNAME":"$USERNAME" "$TAHOMA_DIR"
-						echo -e "\n$(_msg PROPERTY_CHANGED)"
-						break
-					done
-					break
-					;;
-				2)
-					echo -e "\n$(_msg IGNORED_WARNING)"
-					break
-					;;
-			esac
-		done
+                        # Change the ownership recursively
+                        chown -R "$USERNAME":"$USERNAME" "$TAHOMA_DIR"
+                        echo -e "\n$(_msg PROPERTY_CHANGED)"
+                        break
+                    done
+                    break
+                    ;;
+                2)
+                    echo -e "\n$(_msg IGNORED_WARNING)"
+                    break
+                    ;;
+            esac
+        done
+    fi
 }
 
 function _checkRoot() {	
@@ -248,7 +242,7 @@ function _libOpencv() {
 	cd "$THIRDPARTY_DIR"
 
 	echo ">>> $(_msg CLONING_libOpencv)"
-	git clone https://github.com/tahoma2d/opencv || true
+	git clone https://github.com/charliemartinez/opencv || true # author script repository
 
 	cd opencv
 	echo "*" >| .gitignore
@@ -309,7 +303,7 @@ function _libFFmpeg(){
 	cd "$THIRDPARTY_DIR"
 
 	echo ">>> $(_msg CLONING_OPENH264)"
-	git clone https://github.com/cisco/openh264.git openh264 || true
+	git clone https://github.com/charliemartinez/openh264 openh264 || true # author script repository
 
 	cd openh264
 	echo "*" >| .gitignore
@@ -323,7 +317,7 @@ function _libFFmpeg(){
 	cd ..
 
 	echo ">>> $(_msg CLONING_libFFmpeg)"
-	git clone -b v4.3.1 https://github.com/tahoma2d/FFmpeg ffmpeg
+	git clone -b v4.3.1 https://github.com/charliemartinez/FFmpeg ffmpeg # author script repository
 
 	cd ffmpeg
 	echo "*" >| .gitignore
@@ -384,7 +378,7 @@ function _libGphoto2() {
 
 	cd "$THIRDPARTY_DIR"
 	echo ">>> $(_msg CLONING_libGphoto2)"
-	git clone https://github.com/tahoma2d/libgphoto2.git libgphoto2_src
+	git clone https://github.com/charliemartinez/libgphoto2 libgphoto2_src # author script repository
 
 	cd libgphoto2_src
 
@@ -414,7 +408,7 @@ function _libMyPaint() {
 	cd libmypaint
 
 	echo ">>> $(_msg CLONING_LIBMYPAINT)"
-	git clone https://github.com/tahoma2d/libmypaint src
+	git clone https://github.com/charliemartinez/libmypaint src # author script repository
 
 	cd src
 	echo "*" >| .gitignore
@@ -455,7 +449,7 @@ function _libRhubarb() {
 		then
 		   rm -rf ffmpeg
 		fi
-	wget https://github.com/tahoma2d/FFmpeg/releases/download/v5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip
+	wget https://github.com/charliemartinez/FFmpeg/releases/download/5.0.0/ffmpeg-5.0.0-linux64-static-lgpl.zip # author script repository
 	unzip ffmpeg-5.0.0-linux64-static-lgpl.zip 
 	mv ffmpeg-5.0.0-linux64-static-lgpl ffmpeg
 
@@ -465,7 +459,7 @@ function _libRhubarb() {
 		then
 		   rm -rf rhubarb ]
 		fi
-	wget https://github.com/tahoma2d/rhubarb-lip-sync/releases/download/v1.13.0/rhubarb-lip-sync-tahoma2d-linux.zip
+	wget https://github.com/charliemartinez/rhubarb-lip-sync/releases/download/tahoma/rhubarb-lip-sync-tahoma2d-linux.zip # author script repository
 	unzip rhubarb-lip-sync-tahoma2d-linux.zip -d rhubarb
 	
 }
