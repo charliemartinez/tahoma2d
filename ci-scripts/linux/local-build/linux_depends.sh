@@ -232,7 +232,7 @@ function _depends() {
 				exit 1
 			fi
 		fi
-	touch "$CHECKFILE_PACKAGES" 
+	touch $CHECKFILE_PACKAGES
 }
 
 function _libOpencv() {
@@ -480,6 +480,7 @@ function _libRhubarb() {
 	wget https://github.com/charliemartinez/rhubarb-lip-sync/releases/download/tahoma/rhubarb-lip-sync-tahoma2d-linux.zip # author script repository
 	unzip rhubarb-lip-sync-tahoma2d-linux.zip -d rhubarb
 	
+	touch "$CHECKFILE_RHUBARB"
 }
 
 function _cloneIf() {
