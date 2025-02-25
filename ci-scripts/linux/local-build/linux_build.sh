@@ -278,9 +278,15 @@ function _warning() {
 		dialog --title "$(_msg CONFIRM) <Enter>" \
 			   --backtitle "$(_copyright)" \
 			   --yesno "$(_msg WARNING)" 10 60    
-#		if [ $? -ne 0 ]; then
-#			_bye 
-#		fi
+		if [ $? -ne 0 ]; then
+			if [ -e $BIN_DIR ]; then
+			_menu
+			exit 0
+			else
+			_bye
+			exit 0
+			fi
+		fi
 }
 
 # ======================================================================
