@@ -126,17 +126,19 @@ function _dependsDebian() {
 	# Install dependencies for Debian-based systems (e.g., Ubuntu)
 	# Based on: https://github.com/tahoma2d/tahoma2d/blob/master/doc/how_to_build_linux.md
 	echo -e "\n\n"
-		for paquetes in dialog libtiff-dev ffmpeg build-essential git cmake freeglut3-dev libboost-all-dev libegl1-mesa-dev \
-			libfreetype6-dev libgles2-mesa-dev libglew-dev libglib2.0-dev libjpeg-dev libjpeg-turbo8-dev \
-			libjson-c-dev liblz4-dev liblzma-dev liblzo2-dev libpng-dev libsuperlu-dev pkg-config \
-			qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools \
-			libqt5opengl5-dev qtmultimedia5-dev qtwayland5 libqt5multimedia5-plugins libturbojpg0-dev \
-			libqt5serialport5-dev libsuperlu-dev liblz4-dev liblzo-dev libmypaint-dev libglew-dev \
-			freeglut3-dev qt59multimedia qt59script qt59serialport qt59svg qt59tools libopencv-dev \
-			libgsl2 libopenblas-dev libmypaint-1.5-1 libmypaint libturbojpeg0-dev; do apt-get install -y $paquetes 
-		done
-	touch $CHECKFILE_PACKAGES
+	apt-get install -y intltool dialog libtiff-dev ffmpeg build-essential git cmake freeglut3-dev libboost-all-dev libegl1-mesa-dev \
+	libfreetype6-dev libgles2-mesa-dev libglib2.0-dev libjpeg-dev 
+	libjson-c-dev liblz4-dev liblzma-dev liblzo2-dev libpng-dev libsuperlu-dev pkg-config \
+	qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools \
+	libqt5opengl5-dev qtmultimedia5-dev qtwayland5 libqt5multimedia5-plugins libturbojpg0-dev \
+	libqt5serialport5-dev libsuperlu-dev liblz4-dev liblzo-dev libmypaint-dev libglew-dev \
+	freeglut3-dev qt59multimedia qt59script qt59serialport qt59svg qt59tools libopencv-dev \
+	libgsl2 libopenblas-dev libmypaint-1.5-1 libmypaint libturbojpeg0-dev
+	# Conditionals (Ubuntu / Debian)
+	apt-get install libjpeg-turbo8-dev -y || apt-get install libturbojpg0-dev -y
+	apt-get install qt5-default -y || libqt5serialport5-dev
 
+	touch $CHECKFILE_PACKAGES
 }
 
 function _dependsFedora() {
